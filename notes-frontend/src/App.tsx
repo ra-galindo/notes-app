@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import NoteForm from './components/NoteForm';
+import NoteList from './components/NoteList';
+import { fetchNotes } from './services/api';
 import './App.css';
 
-function App() {
+
+type Note = {
+  id: number;
+  title: string;
+  content: string;
+};
+
+const App: React.FC = () => {
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    const loadNotes = async () => {
+      try {
+        const fetchedNotes = await fetchNotes();
+        setNotes(fetchedNotes);
+      } catch (error) {
+        console.error('Failed to fetch notes:', error);
+      }
+    };
+    loadNotes();
+  }, []);
+
+  const handleSave = (newNote: Note) => {
+    setNotes([newNote, ...notes]);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Notes App</h1>
+      <NoteForm onSave={handleSave} />
+      <NoteList notes={notes} setNotes={setNotes} />
     </div>
   );
-}
+};
 
 export default App;

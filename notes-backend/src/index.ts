@@ -1,10 +1,12 @@
 import express from 'express';
 import mysql, { RowDataPacket, OkPacket } from 'mysql2';
 import dotenv from 'dotenv';
+import cors from 'cors'; // Import CORS
 
 dotenv.config();
 
 const app = express();
+app.use(cors()); // Enable CORS for all routes
 const port = process.env.PORT || 5000;
 
 // Create MySQL connection
@@ -58,14 +60,22 @@ app.get('/notes/:id', (req, res) => {
 app.post('/notes', (req, res) => {
   const { title, content } = req.body;
   const query = 'INSERT INTO notes (title, content) VALUES (?, ?)';
-  db.query<OkPacket>(query, [title, content], (err, result) => {
+
+  db.query(query, [title, content], (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
-    res.status(201).json({ id: result.insertId, title, content }); // `result.insertId` is valid on `OkPacket`
+
+    if ('insertId' in result) {
+      res.status(201).json({ id: result.insertId, title, content });
+    } else {
+      res.status(500).json({ error: 'Failed to retrieve insert ID' });
+    }
   });
 });
+
+
 
 // Update a Note
 app.put('/notes/:id', (req, res) => {
