@@ -1,16 +1,11 @@
 import axios from 'axios';
 
+// Set the base URL from the environment variable or a default for local development
 const api = axios.create({
-  baseURL: 'http://localhost:5000', // Update this if needed
+  baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000',
 });
 
-const apiUrl = process.env.REACT_APP_BACKEND_URL;
-
-// Example usage in an axios call:
-axios.get(`${apiUrl}/notes`).then(response => {
-  // handle response
-});
-
+// API functions using the configured `api` instance
 
 export const fetchNotes = async () => {
   const response = await api.get('/notes');
@@ -19,7 +14,7 @@ export const fetchNotes = async () => {
 
 export const createNote = async (data: { title: string; content: string }) => {
   const response = await api.post('/notes', data);
-  return response.data; // Return the newly created note with the ID
+  return response.data;
 };
 
 export const deleteNote = async (id: number) => {
