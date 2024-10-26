@@ -4,6 +4,14 @@ const api = axios.create({
   baseURL: 'http://localhost:5000', // Update this if needed
 });
 
+const apiUrl = process.env.REACT_APP_BACKEND_URL;
+
+// Example usage in an axios call:
+axios.get(`${apiUrl}/notes`).then(response => {
+  // handle response
+});
+
+
 export const fetchNotes = async () => {
   const response = await api.get('/notes');
   return response.data;
